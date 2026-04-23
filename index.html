@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Digital Security Hub — DamuMed Analysis</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-base: #05080f;
+    --bg-card: rgba(10,18,35,0.85);
+    --bg-glass: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.07);
+    --border-glow: rgba(0,200,255,0.25);
+    --accent-cyan: #00c8ff;
+    --accent-teal: #00e5c0;
+    --accent-amber: #ffb700;
+    --accent-red: #ff3b5c;
+    --accent-orange: #ff7a00;
+    --text-primary: #e8eef7;
+    --text-secondary: #7a92b4;
+    --text-dim: #3d5270;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(0,229,192,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,80,160,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .font-display { font-family: 'Syne', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* GLASS CARD */
+  .glass-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+    pointer-events: none; border-radius: inherit;
+  }
+  .glass-card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 40px rgba(0,200,255,0.08), 0 20px 60px rgba(0,0,0,0.5);
+    transform: translateY(-2px);
+  }
+
+  /* TABS */
+  .main-tab-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .main-tab-btn:hover { color: var(--text-primary); background: var(--bg-glass); }
+  .main-tab-btn.active {
+    color: var(--accent-cyan);
+    background: rgba(0,200,255,0.08);
+    border-color: rgba(0,200,255,0.2);
+    box-shadow: 0 0 20px rgba(0,200,255,0.12);
+  }
+
+  .sub-tab-btn {
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 12px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 8px 18px; border-radius: 8px; border: 1px solid transparent;
+    color: var(--text-secondary); background: transparent; cursor: pointer;
+    transition: all 0.22s; display: flex; align-items: center; gap: 6px;
+  }
+  .sub-tab-btn:hover { color: var(--text-primary); }
+  .sub-tab-btn.active {
+    color: var(--accent-teal);
+    background: rgba(0,229,192,0.08);
+    border-color: rgba(0,229,192,0.2);
+  }
+
+  /* RISK BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 6px;
+  }
+  .badge-critical { background: rgba(255,59,92,0.15); color: #ff3b5c; border: 1px solid rgba(255,59,92,0.3); }
+  .badge-high     { background: rgba(255,122,0,0.15);  color: #ff7a00; border: 1px solid rgba(255,122,0,0.3); }
+  .badge-medium   { background: rgba(255,183,0,0.12);  color: #ffb700; border: 1px solid rgba(255,183,0,0.25); }
+
+  /* PROGRESS BAR */
+  .progress-track {
+    height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-teal));
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 12px rgba(0,200,255,0.5);
+  }
+  .progress-fill.danger { background: linear-gradient(90deg, #ff3b5c, #ff7a00); box-shadow: 0 0 12px rgba(255,59,92,0.5); }
+  .progress-fill.warn   { background: linear-gradient(90deg, #ffb700, #ff7a00); box-shadow: 0 0 12px rgba(255,183,0,0.5); }
+
+  /* STAT CARD */
+  .stat-number {
+    font-family: 'Syne', sans-serif; font-size: 2.6rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1;
+  }
+  .stat-number.danger {
+    background: linear-gradient(135deg, #ff3b5c, #ff7a00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-number.warn {
+    background: linear-gradient(135deg, #ffb700, #ff7a00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* CHECKLIST */
+  .check-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 18px; border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-glass);
+    transition: all 0.22s; cursor: pointer;
+  }
+  .check-item:hover { border-color: rgba(0,229,192,0.25); background: rgba(0,229,192,0.04); }
+  .check-item.done { opacity: 0.55; }
+  .check-box {
+    width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; margin-top: 2px;
+    border: 2px solid var(--text-dim); display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .check-item.done .check-box { background: var(--accent-teal); border-color: var(--accent-teal); }
+  .check-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim);
+    margin-top: 3px; min-width: 20px;
+  }
+
+  /* POLICY ROW */
+  .policy-row {
+    padding: 18px 20px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--bg-glass);
+    transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .policy-row::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 2px; transition: background 0.25s;
+  }
+  .policy-row.critical::before { background: var(--accent-red); }
+  .policy-row.high::before    { background: var(--accent-orange); }
+  .policy-row.medium::before  { background: var(--accent-amber); }
+  .policy-row:hover { border-color: var(--border-glow); transform: translateX(4px); }
+
+  /* LANG SWITCHER */
+  .lang-btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; padding: 6px 12px; border-radius: 8px;
+    border: 1px solid var(--border); color: var(--text-secondary);
+    background: transparent; cursor: pointer; transition: all 0.2s;
+  }
+  .lang-btn:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+  .lang-btn.active { color: var(--accent-cyan); border-color: rgba(0,200,255,0.35); background: rgba(0,200,255,0.07); }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.55s ease both; }
+  .fade-up-d1 { animation-delay: 0.08s; }
+  .fade-up-d2 { animation-delay: 0.16s; }
+  .fade-up-d3 { animation-delay: 0.24s; }
+
+  @keyframes pulse-glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.0); }
+    50%      { box-shadow: 0 0 0 6px rgba(0,200,255,0.08); }
+  }
+  .pulse { animation: pulse-glow 3s ease infinite; }
+
+  /* SCAN LINE HEADER EFFECT */
+  .scan-line {
+    position: relative; overflow: hidden;
+  }
+  .scan-line::after {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,200,255,0.06), transparent);
+    animation: scan 4s ease-in-out infinite;
+  }
+  @keyframes scan { 0%{left:-60%} 100%{left:160%} }
+
+  /* HEADER GLOW LINE */
+  .glow-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-teal), transparent);
+    opacity: 0.4;
+  }
+
+  /* TOOLTIP */
+  .tooltip-wrap { position: relative; }
+  .tooltip-wrap .tooltip-box {
+    display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%); background: #0d1829; border: 1px solid var(--border-glow);
+    border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--text-secondary);
+    white-space: nowrap; z-index: 100; pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .tooltip-wrap:hover .tooltip-box { display: block; }
+
+  /* SECTION DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  /* ICON CIRCLE */
+  .icon-circle {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  /* TAG */
+  .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border);
+  }
+
+  /* HIDDEN */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* HEADER BRAND */
+  .brand-logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(0,200,255,0.3);
+  }
+
+  /* COUNTER ANIMATION */
+  .counting { transition: none; }
+</style>
+</head>
+<body>
+<div id="app" class="relative z-10 min-h-screen">
+
+  <header class="sticky top-0 z-50 scan-line" style="background:rgba(5,8,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-3">
+        <div class="brand-logo pulse">
+          <i data-lucide="shield-check" style="color:#05080f;width:20px;height:20px;stroke-width:2.5"></i>
+        </div>
+        <div>
+          <div class="font-display font-bold text-base leading-tight" style="color:var(--text-primary)">
+            Digital Security Hub
+          </div>
+          <div class="font-mono text-xs" style="color:var(--text-dim)">DamuMed / MSc Cybersecurity Research</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-1 p-1 rounded-xl" style="background:var(--bg-glass);border:1px solid var(--border);">
+          <button class="lang-btn active" onclick="setLang('en')" id="lang-en">EN</button>
+          <button class="lang-btn" onclick="setLang('ru')" id="lang-ru">RU</button>
+          <button class="lang-btn" onclick="setLang('kk')" id="lang-kk">KK</button>
+        </div>
+        <nav class="flex items-center gap-1 p-1 rounded-xl overflow-x-auto" style="background:var(--bg-glass);border:1px solid var(--border);">
+          <button class="main-tab-btn active" onclick="switchTab('research')" id="tab-research">
+            <i data-lucide="bar-chart-2" style="width:14px;height:14px"></i>
+            <span data-t="tab_research"></span>
+          </button>
+          <button class="main-tab-btn" onclick="switchTab('policy')" id="tab-policy">
+            <i data-lucide="file-text" style="width:14px;height:14px"></i>
+            <span data-t="tab_policy"></span>
+          </button>
+          <button class="main-tab-btn" onclick="switchTab('guidelines')" id="tab-guidelines">
+            <i data-lucide="shield" style="width:14px;height:14px"></i>
+            <span data-t="tab_guidelines"></span>
+          </button>
+          <button class="main-tab-btn" onclick="switchTab('xai')" id="tab-xai">
+            <i data-lucide="cpu" style="width:14px;height:14px"></i>
+            <span data-t="tab_xai"></span>
+          </button>
+        </nav>
+      </div>
+    </div>
+    <div class="glow-line"></div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 pt-10 pb-4">
+    <div class="glass-card p-6 md:p-8 mb-8 fade-up" style="background:linear-gradient(135deg,rgba(0,200,255,0.06),rgba(0,229,192,0.04));border-color:rgba(0,200,255,0.15);">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="tag mb-3" data-t="hero_tag"></div>
+          <h1 class="font-display font-extrabold text-3xl md:text-4xl leading-tight mb-3" data-t="hero_title"></h1>
+          <p class="text-sm max-w-xl" style="color:var(--text-secondary)" data-t="hero_subtitle"></p>
+        </div>
+        <div class="flex gap-4 flex-wrap md:flex-nowrap">
+          <div class="glass-card px-6 py-4 text-center" style="min-width:110px">
+            <div class="font-display font-extrabold text-2xl" style="color:var(--accent-cyan)">162</div>
+            <div class="text-xs mt-1" style="color:var(--text-secondary)" data-t="hero_stat_users"></div>
+          </div>
+          <div class="glass-card px-6 py-4 text-center" style="min-width:110px">
+            <div class="font-display font-extrabold text-2xl" style="color:var(--accent-teal)">30</div>
+            <div class="text-xs mt-1" style="color:var(--text-secondary)" data-t="hero_stat_days"></div>
+          </div>
+          <div class="glass-card px-6 py-4 text-center" style="min-width:110px">
+            <div class="font-display font-extrabold text-2xl" style="color:var(--accent-amber)">10</div>
+            <div class="text-xs mt-1" style="color:var(--text-secondary)" data-t="hero_stat_risks"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 pb-20">
+
+    <div id="panel-research" class="tab-panel active">
+      <div class="mb-6">
+        <h2 class="font-display font-bold text-xl mb-1" data-t="research_title"></h2>
+        <p class="text-sm" style="color:var(--text-secondary)" data-t="research_subtitle"></p>
+      </div>
+
+      <div class="glass-card p-6 mb-6 fade-up">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="icon-circle" style="background:rgba(0,200,255,0.1)">
+            <i data-lucide="users" style="color:var(--accent-cyan);width:20px;height:20px"></i>
+          </div>
+          <div>
+            <div class="font-display font-bold" data-t="stat1_title"></div>
+            <div class="text-xs" style="color:var(--text-dim)" data-t="stat1_sub"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <div class="flex justify-between text-xs mb-2">
+              <span data-t="demo_patients"></span>
+              <span class="font-mono" style="color:var(--accent-cyan)">51%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:51%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-2">
+              <span data-t="demo_staff"></span>
+              <span class="font-mono" style="color:var(--accent-teal)">22%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:22%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-2">
+              <span data-t="demo_public"></span>
+              <span class="font-mono" style="color:var(--accent-amber)">18%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill warn" style="width:18%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-2">
+              <span data-t="demo_it"></span>
+              <span class="font-mono" style="color:var(--text-secondary)">9%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:9%;opacity:0.6"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-5" id="stats-grid">
+        </div>
+    </div>
+
+    <div id="panel-policy" class="tab-panel">
+      <div class="mb-6">
+        <h2 class="font-display font-bold text-xl mb-1" data-t="policy_title"></h2>
+        <p class="text-sm" style="color:var(--text-secondary)" data-t="policy_subtitle"></p>
+      </div>
+      <div class="flex items-center gap-4 mb-6 flex-wrap">
+        <span class="badge badge-critical"><span>●</span> <span data-t="risk_critical"></span></span>
+        <span class="badge badge-high"><span>●</span> <span data-t="risk_high"></span></span>
+        <span class="badge badge-medium"><span>●</span> <span data-t="risk_medium"></span></span>
+        <span class="text-xs ml-auto" style="color:var(--text-dim)" data-t="policy_legend_note"></span>
+      </div>
+      <div class="flex flex-col gap-4" id="policy-list">
+        </div>
+    </div>
+
+    <div id="panel-guidelines" class="tab-panel">
+      <div class="mb-6">
+        <h2 class="font-display font-bold text-xl mb-1" data-t="guide_title"></h2>
+        <p class="text-sm" style="color:var(--text-secondary)" data-t="guide_subtitle"></p>
+      </div>
+      <div class="flex items-center gap-2 mb-6 p-1 rounded-xl" style="background:var(--bg-glass);border:1px solid var(--border);width:fit-content">
+        <button class="sub-tab-btn active" onclick="switchSubTab('patients')" id="subtab-patients">
+          <i data-lucide="user" style="width:13px;height:13px"></i>
+          <span data-t="role_patients"></span>
+        </button>
+        <button class="sub-tab-btn" onclick="switchSubTab('staff')" id="subtab-staff">
+          <i data-lucide="stethoscope" style="width:13px;height:13px"></i>
+          <span data-t="role_staff"></span>
+        </button>
+        <button class="sub-tab-btn" onclick="switchSubTab('it')" id="subtab-it">
+          <i data-lucide="server" style="width:13px;height:13px"></i>
+          <span data-t="role_it"></span>
+        </button>
+      </div>
+      <div id="guide-patients" class="guide-panel"></div>
+      <div id="guide-staff"    class="guide-panel" style="display:none"></div>
+      <div id="guide-it"       class="guide-panel" style="display:none"></div>
+    </div>
+
+    <div id="panel-xai" class="tab-panel">
+      <div class="mb-6">
+        <h2 class="font-display font-bold text-xl mb-1" data-t="xai_title"></h2>
+        <p class="text-sm" style="color:var(--text-secondary)" data-t="xai_subtitle"></p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass-card p-6 lg:col-span-1 fade-up">
+          <h3 class="font-display font-bold mb-5" style="color:var(--accent-cyan)" data-t="xai_params"></h3>
+          
+          <div class="mb-6">
+            <label class="text-xs mb-2 block" style="color:var(--text-secondary)"><span data-t="xai_bmi"></span>: <span id="xai-bmi-val" class="font-mono text-white">25</span></label>
+            <input type="range" id="xai-bmi" min="15" max="50" value="25" class="w-full" style="accent-color: var(--accent-cyan);" oninput="updateXAI()">
+          </div>
+          
+          <div class="mb-6">
+            <label class="text-xs mb-2 block" style="color:var(--text-secondary)" data-t="xai_genetics"></label>
+            <select id="xai-genetics" class="w-full border rounded-lg p-2 text-sm text-white" style="background:var(--bg-card); border-color:var(--border);" onchange="updateXAI()">
+              <option value="0" style="background:#05080f" data-t="xai_gen_low"></option>
+              <option value="15" style="background:#05080f" data-t="xai_gen_med"></option>
+              <option value="30" style="background:#05080f" data-t="xai_gen_high"></option>
+            </select>
+          </div>
+
+          <div class="mb-4 flex items-center justify-between">
+            <label class="text-xs" style="color:var(--text-secondary)" data-t="xai_typo"></label>
+            <input type="checkbox" id="xai-typo" class="w-4 h-4" style="accent-color: var(--accent-red);" onchange="updateXAI()">
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          
+          <div class="glass-card p-6 fade-up" style="border-color: rgba(255,59,92,0.3);">
+            <div class="flex items-center gap-3 mb-4">
+              <i data-lucide="box" style="color:var(--accent-red)"></i>
+              <h3 class="font-display font-bold text-sm" data-t="xai_bb_title"></h3>
+            </div>
+            <p class="text-xs mb-2" style="color:var(--text-dim)" data-t="xai_bb_desc"></p>
+            <div class="flex items-center gap-4">
+              <div class="text-4xl font-display font-bold" id="blackbox-score" style="color:var(--accent-red)">20%</div>
+              <div>
+                <div class="text-sm font-bold" data-t="xai_bb_score"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 fade-up" style="border-color: rgba(0,229,192,0.3);">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <i data-lucide="search" style="color:var(--accent-teal)"></i>
+                <h3 class="font-display font-bold text-sm" data-t="xai_audit_title"></h3>
+              </div>
+              <span class="badge badge-medium" data-t="xai_audit_badge"></span>
+            </div>
+            <p class="text-xs mb-4" style="color:var(--text-dim)" data-t="xai_audit_desc"></p>
+            
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span style="color:var(--text-primary)" data-t="xai_bmi_risk"></span>
+                  <span class="font-mono" id="xai-bmi-bar-val">20%</span>
+                </div>
+                <div class="progress-track"><div id="xai-bmi-bar" class="progress-fill" style="width:20%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span style="color:var(--accent-amber)" data-t="xai_gen_risk"></span>
+                  <span class="font-mono" style="color:var(--accent-amber)" id="xai-gen-bar-val">0%</span>
+                </div>
+                <div class="progress-track"><div id="xai-gen-bar" class="progress-fill warn" style="width:0%"></div></div>
+              </div>
+              <div id="xai-typo-container" style="display:none; transition: all 0.3s;">
+                <div class="flex justify-between text-xs mb-1">
+                  <span style="color:var(--accent-red)" data-t="xai_typo_risk"></span>
+                  <span class="font-mono" style="color:var(--accent-red)" id="xai-typo-bar-val">+45%</span>
+                </div>
+                <div class="progress-track"><div id="xai-typo-bar" class="progress-fill danger" style="width:45%"></div></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t" style="border-color:var(--border);background:rgba(5,8,15,0.7)">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="text-xs font-mono" style="color:var(--text-dim)" data-t="footer_copy"></div>
+      <div class="flex items-center gap-2 text-xs" style="color:var(--text-dim)">
+        <i data-lucide="lock" style="width:12px;height:12px"></i>
+        <span data-t="footer_note"></span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// TRANSLATION DICTIONARY
+// ============================================================
+const T = {
+  en: {
+    tab_research: "Research Insights",
+    tab_policy: "Policy Decoder",
+    tab_guidelines: "Security Guidelines",
+    tab_xai: "XAI Simulator",
+
+    hero_tag: "MSc Cybersecurity Dissertation · DamuMed Privacy Audit",
+    hero_title: "Digital Security Hub",
+    hero_subtitle: "Empirical findings from a 162-user, 30-day survey on digital privacy and security in Kazakhstan's national healthcare app DamuMed.",
+    hero_stat_users: "Survey Participants",
+    hero_stat_days: "Day Study Period",
+    hero_stat_risks: "Critical Risks Found",
+
+    research_title: "Research Insights",
+    research_subtitle: "Empirical data findings from the primary survey — 162 respondents across four user groups.",
+
+    stat1_title: "Demographics",
+    stat1_sub: "162 total survey participants across 4 role groups",
+    demo_patients: "Patients",
+    demo_staff: "Medical Staff",
+    demo_public: "General Public",
+    demo_it: "IT Professionals",
+
+    // Stat cards data
+    s2_title: "The Training Gap",
+    s2_val: "54%",
+    s2_desc: "of healthcare users have NEVER received official digital privacy training.",
+    s2_color: "danger",
+    s3_title: "Shadow IT Epidemic",
+    s3_val: "69%",
+    s3_desc: "of medical staff bypass security and use personal messengers (WhatsApp/Telegram) to send patient data.",
+    s3_color: "danger",
+    s4_title: "Credential Sharing",
+    s4_val: "25%",
+    s4_desc: "of doctors openly share their DamuMed passwords with colleagues to save time.",
+    s4_color: "warn",
+    s5_title: "Illusion of Consent",
+    s5_val: "84%",
+    s5_desc: "of users blindly accept the Privacy Policy without reading it completely.",
+    s5_color: "danger",
+    s6_title: "Metadata Ignorance",
+    s6_val: "45%",
+    s6_desc: "are completely unaware the app tracks GPS and device data.",
+    s6_color: "warn",
+    s7_title: "Rectification Block",
+    s7_val: "71%",
+    s7_desc: "find fixing errors in their medical records difficult or impossible.",
+    s7_color: "danger",
+    s8_title: "The AI Black Box",
+    s8_val: "82%",
+    s8_desc: "lack a full understanding of what personal data the AI uses for predictions.",
+    s8_color: "danger",
+    s9_title: "Low AI Trust",
+    s9_val: "2.71/5",
+    s9_desc: "Baseline trust in AI diagnostics is critically low — far below acceptable thresholds.",
+    s9_color: "warn",
+    s10_title: "Demand for Transparency",
+    s10_val: "90%",
+    s10_desc: "demand mandatory notifications when AI processes their health data.",
+    s10_color: "default",
+
+    policy_title: "Policy Decoder",
+    policy_subtitle: "10 critical analysis points from the DamuMed Privacy Policy — what the clauses actually mean and the risks they carry.",
+    risk_critical: "Critical",
+    risk_high: "High",
+    risk_medium: "Medium",
+    policy_legend_note: "← Left border colour indicates risk severity",
+
+    p1_concept: "Over-collection of Data",
+    p1_clause: "App collects IIN, GPS, family relationship data.",
+    p1_meaning: "Violates GDPR Data Minimisation principle — collecting far more than required for core functionality.",
+    p1_risk: "HIGH",
+    p2_concept: "Metadata Extraction",
+    p2_clause: "Extracts EXIF data (timestamp & location) from uploaded photos.",
+    p2_meaning: "Side-channel tracking remains active even when GPS is manually disabled by the user.",
+    p2_risk: "HIGH",
+    p3_concept: "Device Fingerprinting",
+    p3_clause: "Collects OS version and exact device hardware IDs.",
+    p3_meaning: "Anonymity becomes technically impossible; health records are permanently tied to physical hardware.",
+    p3_risk: "CRITICAL",
+    p4_concept: "Vague AI Processing",
+    p4_clause: "\"Data used for analysis.\"",
+    p4_meaning: "User data trains proprietary AI models without explicit algorithmic consent from the data subject.",
+    p4_risk: "CRITICAL",
+    p5_concept: "Violation of Autonomy",
+    p5_clause: "Registration data fields are locked and uneditable.",
+    p5_meaning: "Users cannot correct errors, causing AI to learn from inaccurate data (Garbage In, Garbage Out).",
+    p5_risk: "HIGH",
+    p6_concept: "Indefinite Data Hoarding",
+    p6_clause: "\"Stored as long as necessary.\"",
+    p6_meaning: "No strict deletion timeline defined — violates the Storage Limitation principle of data protection law.",
+    p6_risk: "HIGH",
+    p7_concept: "Unregulated Partner Sharing",
+    p7_clause: "Data shared with partner pharmacies and clinics.",
+    p7_meaning: "Creates unchecked Data Sprawl with no contractual guarantee that third parties will ever delete the data.",
+    p7_risk: "MEDIUM",
+    p8_concept: "Hardware Access",
+    p8_clause: "App requires access to camera and microphone.",
+    p8_meaning: "Proprietary software with continuous hardware access introduces ambient eavesdropping risk vectors.",
+    p8_risk: "MEDIUM",
+    p9_concept: "State Database Linkage",
+    p9_clause: "Directly linked to citizen e-Gov profiles.",
+    p9_meaning: "Creates a massive centralised health-identity honeypot — an attractive, high-value target for cybercriminals.",
+    p9_risk: "CRITICAL",
+    p10_concept: "Lack of Transparency",
+    p10_clause: "Privacy Policy contains no mention of AI decision-making logic.",
+    p10_meaning: "Prevents independent auditing of AI diagnostic errors and accountability for algorithmic harm.",
+    p10_risk: "HIGH",
+
+    guide_title: "Security Guidelines",
+    guide_subtitle: "30 actionable recommendations — 10 per stakeholder role. Click each item to mark as reviewed.",
+    role_patients: "Patients",
+    role_staff: "Medical Staff",
+    role_it: "IT & Admins",
+
+    // PATIENTS
+    g_p1_title: "Scrub EXIF from Uploads",
+    g_p1_desc: "DamuMed's policy allows extracting metadata from uploaded photos. Strip location data from pictures of your medical tests before uploading them to the app.",
+    g_p2_title: "Audit for Phantom Visits",
+    g_p2_desc: "DamuMed is prone to 'phantom visits' created for clinic quotas. Check your history regularly. Fake visits feed bad data to AI predicting your future health risks.",
+    g_p3_title: "Escalate via e-Otinish",
+    g_p3_desc: "If the clinic registry refuses to delete incorrect data in your DamuMed profile, do not give up. File a formal complaint via the state 'e-Otinish' portal to force compliance.",
+    g_p4_title: "Isolate e-Gov Phone Numbers",
+    g_p4_desc: "DamuMed is linked to the Mobile Citizens Database via your IIN. Use a separate phone number for medical apps and financial banking to mitigate SIM-swapping risks.",
+    g_p5_title: "Revoke Hardware Post-Telemed",
+    g_p5_desc: "DamuMed requests mic/camera access for remote consultations. Revoke these OS-level permissions immediately after the call ends to prevent background eavesdropping.",
+    g_p6_title: "Unlink Independent Relatives",
+    g_p6_desc: "DamuMed auto-links family profiles. Unlink adult children or parents who have their own devices to prevent lateral data exposure if one phone is compromised.",
+    g_p7_title: "Decline Pharmacy Data Sharing",
+    g_p7_desc: "Explicitly opt-out of sharing prescriptions with third-party partner pharmacies inside the app, as there is no contractual guarantee they will ever delete your data.",
+    g_p8_title: "Demand Human Override",
+    g_p8_desc: "If prescribed medication based on a DamuMed prompt, ask the doctor: 'Is this the CDSS algorithm's suggestion or your independent clinical conclusion?'",
+    g_p9_title: "Monitor OTP Requests",
+    g_p9_desc: "DamuMed relies on SMS OTPs. If you receive an unexpected code, it signals an active brute-force attempt on your IIN. Contact support immediately.",
+    g_p10_title: "Formal Deletion Protocol",
+    g_p10_desc: "Deleting the DamuMed app from your phone does not delete your medical profile. You must submit a formal erasure request to your clinic's administration.",
+
+    // STAFF
+    g_s1_title: "PACS over WhatsApp",
+    g_s1_desc: "Stop using WhatsApp for X-rays. If DamuMed lacks a fast DICOM viewer, formally request IT to deploy a secure local PACS chat, citing the RK Law on Personal Data.",
+    g_s2_title: "Document Algorithm Overrides",
+    g_s2_desc: "If you disagree with DamuMed's Clinical Decision Support System (AI) suggestion, document your exact clinical reasoning in the free-text notes to avoid algorithmic liability.",
+    g_s3_title: "Stop Phantom Quotas",
+    g_s3_desc: "Never create fake appointments to fulfill quotas. This poisons the national centralized database, causing systemic 'Garbage In, Garbage Out' (GIGO) for future AI models.",
+    g_s4_title: "Lock Shared Terminals",
+    g_s4_desc: "Nurses and doctors share PCs. If you leave the desk without logging out of DamuMed, any AI or human error made on that terminal is legally tied to your IIN.",
+    g_s5_title: "Direct IIN Entry",
+    g_s5_desc: "Never take photos of patient ID cards on your personal phone to enter them into DamuMed later. This syncs sensitive patient data to unsecure Apple iCloud or Google Photos.",
+    g_s6_title: "Report UI Friction",
+    g_s6_desc: "If a DamuMed drop-down menu lacks the correct diagnosis, do not choose a 'random' close option. File an IT ticket. Incorrect codes fatally skew AI predictive models.",
+    g_s7_title: "Inform Patients of AI Use",
+    g_s7_desc: "When explaining risks calculated by DamuMed's predictive tools, legally cover yourself by informing the patient: 'The system calculated this based on your electronic history.'",
+    g_s8_title: "Verify Aggregated Data",
+    g_s8_desc: "DamuMed aggregates lab results from third-party private clinics. Always verify unusual external results with the patient before basing a critical diagnosis on them.",
+    g_s9_title: "No Mobile App on Personal Phones",
+    g_s9_desc: "Do not install the DamuMed Doctor application on a personal smartphone that lacks Mobile Device Management (MDM) and is full of social media trackers.",
+    g_s10_title: "Never Share Smart Cards",
+    g_s10_desc: "If your clinic uses hardware tokens or EDS (ЭЦП) for DamuMed access, never leave them plugged into the USB port of a shared nursing station.",
+
+    // IT
+    g_i1_title: "Decouple Telemetry from PHI",
+    g_i1_desc: "Architecturally separate the DamuMed logging database (device IPs, session IDs) from the Clinical Database (diagnoses) to prevent trivial deanonymization during SQL injections.",
+    g_i2_title: "Server-Side EXIF Scrubbing",
+    g_i2_desc: "Implement automated scripts (e.g., ImageMagick) to permanently strip GPS and device metadata from all patient-uploaded documents before they hit the storage buckets.",
+    g_i3_title: "Break-Glass Hardware MFA",
+    g_i3_desc: "Doctors share passwords because typing is slow. Deploy fast, single-tap hardware MFA (NFC badges or FIDO2 keys) to eliminate the operational excuse for credential sharing.",
+    g_i4_title: "e-Gov API Payload Minimization",
+    g_i4_desc: "When DamuMed queries the state e-Gov database for IIN validation, restrict the API payload to fetch ONLY the validation token, not the entire family tree.",
+    g_i5_title: "XAI Audit Logging",
+    g_i5_desc: "Modify the CDSS architecture so every algorithmic recommendation logs its exact input variables and confidence score, enabling transparent clinical audits of AI mistakes.",
+    g_i6_title: "Context-Aware RBAC",
+    g_i6_desc: "Shift from blanket 'Doctor' roles to granular access. A dentist using DamuMed should not have default, unlogged access to a patient's psychiatric or oncological history.",
+    g_i7_title: "Automated Partner TTL",
+    g_i7_desc: "Enforce strict API expiration tokens (Time-To-Live) for third-party pharmacies. They must lose access to the digital prescription data the second the transaction completes.",
+    g_i8_title: "Patient-Facing Dispute UI",
+    g_i8_desc: "Build a secure 'Dispute Record' button directly inside the DamuMed patient app that routes data correction requests to a medical board, bypassing the registry bottleneck.",
+    g_i9_title: "Anonymize AI Training Pipelines",
+    g_i9_desc: "Ensure any data piped from DamuMed's operational databases to AI training servers is strictly subjected to k-anonymity, stripping all exact IINs and names.",
+    g_i10_title: "Rate-Limit Patient Search",
+    g_i10_desc: "Implement aggressive API rate-limiting and anomaly detection on the 'Search Patient by IIN' function to block automated scraping by malicious internal or external actors.",
+
+    // XAI SIMULATOR
+    xai_title: "Explainable AI (XAI) Simulator",
+    xai_subtitle: "Compare a Black Box algorithm with an auditable Explainable AI system.",
+    xai_params: "Patient Parameters",
+    xai_bmi: "Body Mass Index (BMI)",
+    xai_genetics: "Genetic Risk",
+    xai_gen_low: "Low",
+    xai_gen_med: "Medium",
+    xai_gen_high: "High",
+    xai_typo: "Simulate Typo (Input Weight: 300 kg)",
+    xai_bb_title: "DamuMed: Black Box",
+    xai_bb_desc: "System outputs final verdict without explaining the reasoning.",
+    xai_bb_score: "Disease Risk",
+    xai_audit_title: "XAI Audit Log",
+    xai_audit_badge: "Debug Mode",
+    xai_audit_desc: "Decision decomposition: how the risk percentage was calculated.",
+    xai_bmi_risk: "BMI Contribution",
+    xai_gen_risk: "Genetics Contribution",
+    xai_typo_risk: "Anomaly: Data Entry Error (Weight: 300kg)",
+
+    footer_copy: "© 2024 Digital Security Hub · MSc Cybersecurity Dissertation Research",
+    footer_note: "For academic and educational purposes only",
+  },
+
+  ru: {
+    tab_research: "Результаты исследования",
+    tab_policy: "Декодер политики",
+    tab_guidelines: "Руководства",
+    tab_xai: "Симулятор XAI",
+
+    hero_tag: "Диссертация MSc по кибербезопасности · Аудит конфиденциальности DamuMed",
+    hero_title: "Центр цифровой безопасности",
+    hero_subtitle: "Эмпирические данные 30-дневного опроса 162 пользователей о цифровой конфиденциальности и безопасности в казахстанском приложении здравоохранения DamuMed.",
+    hero_stat_users: "Участников опроса",
+    hero_stat_days: "Дней исследования",
+    hero_stat_risks: "Критических рисков",
+
+    research_title: "Результаты исследования",
+    research_subtitle: "Эмпирические данные первичного опроса — 162 респондента из четырёх групп пользователей.",
+
+    stat1_title: "Демография",
+    stat1_sub: "162 участника опроса в 4 ролевых группах",
+    demo_patients: "Пациенты",
+    demo_staff: "Медицинский персонал",
+    demo_public: "Общественность",
+    demo_it: "IT-специалисты",
+
+    s2_title: "Пробел в обучении",
+    s2_val: "54%",
+    s2_desc: "медицинских работников НИКОГДА не проходили официального обучения цифровой конфиденциальности.",
+    s2_color: "danger",
+    s3_title: "Эпидемия теневых IT",
+    s3_val: "69%",
+    s3_desc: "медицинского персонала обходят защиту и отправляют данные пациентов через личные мессенджеры (WhatsApp/Telegram).",
+    s3_color: "danger",
+    s4_title: "Передача учётных данных",
+    s4_val: "25%",
+    s4_desc: "врачей открыто передают свои пароли DamuMed коллегам для экономии времени.",
+    s4_color: "warn",
+    s5_title: "Иллюзия согласия",
+    s5_val: "84%",
+    s5_desc: "пользователей бездумно принимают Политику конфиденциальности, не читая её полностью.",
+    s5_color: "danger",
+    s6_title: "Незнание метаданных",
+    s6_val: "45%",
+    s6_desc: "совершенно не знают, что приложение отслеживает их GPS и данные устройства.",
+    s6_color: "warn",
+    s7_title: "Блокировка исправлений",
+    s7_val: "71%",
+    s7_desc: "считают исправление ошибок в своих медицинских записях трудным или невозможным.",
+    s7_color: "danger",
+    s8_title: "Непрозрачность ИИ",
+    s8_val: "82%",
+    s8_desc: "не понимают в полной мере, какие персональные данные ИИ использует для прогнозов.",
+    s8_color: "danger",
+    s9_title: "Низкое доверие к ИИ",
+    s9_val: "2.71/5",
+    s9_desc: "Базовый уровень доверия к ИИ-диагностике критически низкий — значительно ниже приемлемых порогов.",
+    s9_color: "warn",
+    s10_title: "Требование прозрачности",
+    s10_val: "90%",
+    s10_desc: "требуют обязательных уведомлений при обработке их медицинских данных ИИ.",
+    s10_color: "default",
+
+    policy_title: "Декодер политики конфиденциальности",
+    policy_subtitle: "10 критических аналитических пунктов Политики конфиденциальности DamuMed — что пункты означают на практике и какие риски несут.",
+    risk_critical: "Критический",
+    risk_high: "Высокий",
+    risk_medium: "Средний",
+    policy_legend_note: "← Цвет левой границы — степень серьёзности риска",
+
+    p1_concept: "Избыточный сбор данных",
+    p1_clause: "Приложение собирает ИИН, GPS, данные о семейных отношениях.",
+    p1_meaning: "Нарушает принцип минимизации данных GDPR — собирается значительно больше, чем необходимо для основных функций.",
+    p1_risk: "HIGH",
+    p2_concept: "Извлечение метаданных",
+    p2_clause: "Извлекает данные EXIF (время и геолокацию) из загруженных фотографий.",
+    p2_meaning: "Боковое отслеживание остаётся активным даже при ручном отключении GPS пользователем.",
+    p2_risk: "HIGH",
+    p3_concept: "Снятие цифрового отпечатка",
+    p3_clause: "Собирает версию ОС и точные идентификаторы аппаратного обеспечения устройства.",
+    p3_meaning: "Анонимность становится технически невозможной; медицинские записи навсегда привязаны к физическому устройству.",
+    p3_risk: "CRITICAL",
+    p4_concept: "Размытая обработка ИИ",
+    p4_clause: "«Данные используются для анализа».",
+    p4_meaning: "Данные пользователя обучают проприетарные модели ИИ без явного алгоритмического согласия субъекта данных.",
+    p4_risk: "CRITICAL",
+    p5_concept: "Нарушение автономии",
+    p5_clause: "Поля регистрационных данных заблокированы и не редактируются.",
+    p5_meaning: "Пользователи не могут исправить ошибки, что заставляет ИИ обучаться на неверных данных (мусор на входе — мусор на выходе).",
+    p5_risk: "HIGH",
+    p6_concept: "Бессрочное хранение данных",
+    p6_clause: "«Хранится столько, сколько необходимо».",
+    p6_meaning: "Не определены чёткие сроки удаления — нарушает принцип ограничения хранения в законодательстве о защите данных.",
+    p6_risk: "HIGH",
+    p7_concept: "Неконтролируемая передача партнёрам",
+    p7_clause: "Данные передаются аптекам-партнёрам и клиникам.",
+    p7_meaning: "Создаёт неконтролируемое «расползание данных» без договорных гарантий удаления у третьих сторон.",
+    p7_risk: "MEDIUM",
+    p8_concept: "Доступ к оборудованию",
+    p8_clause: "Приложение требует доступ к камере и микрофону.",
+    p8_meaning: "Проприетарное ПО с постоянным доступом к оборудованию создаёт риски фонового прослушивания.",
+    p8_risk: "MEDIUM",
+    p9_concept: "Связь с государственными базами данных",
+    p9_clause: "Напрямую связано с профилями e-Gov граждан.",
+    p9_meaning: "Создаёт огромный централизованный «горшок с мёдом» — ценную цель для киберпреступников.",
+    p9_risk: "CRITICAL",
+    p10_concept: "Отсутствие прозрачности",
+    p10_clause: "В Политике конфиденциальности не упоминается логика принятия решений ИИ.",
+    p10_meaning: "Исключает независимый аудит диагностических ошибок ИИ и ответственность за алгоритмический вред.",
+    p10_risk: "HIGH",
+
+    guide_title: "Руководства по безопасности",
+    guide_subtitle: "30 практических рекомендаций — по 10 для каждой роли. Нажмите на пункт, чтобы отметить его как проверенный.",
+    role_patients: "Пациенты",
+    role_staff: "Медперсонал",
+    role_it: "IT и Администраторы",
+
+    g_p1_title: "Удаляйте EXIF-данные из загрузок",
+    g_p1_desc: "Политика DamuMed позволяет извлекать метаданные из загруженных фото. Удаляйте данные о геолокации со снимков ваших анализов перед их загрузкой в приложение.",
+    g_p2_title: "Проверяйте историю на «приписки»",
+    g_p2_desc: "В DamuMed часто появляются «фиктивные приемы» ради квот. Регулярно проверяйте историю. Фейковые визиты обучают ИИ на ложных данных, искажая прогнозы вашего здоровья.",
+    g_p3_title: "Жалуйтесь через e-Otinish",
+    g_p3_desc: "Если регистратура отказывается удалять неверные данные в профиле DamuMed, не сдавайтесь. Подайте официальную жалобу через портал «e-Otinish», чтобы заставить их соблюдать закон.",
+    g_p4_title: "Изолируйте номера для e-Gov",
+    g_p4_desc: "DamuMed связан с Базой мобильных граждан через ИИН. Используйте отдельный номер телефона для медицинских приложений и банкинга, чтобы снизить риски кражи (SIM-свопинга).",
+    g_p5_title: "Блокируйте доступ после телемедицины",
+    g_p5_desc: "DamuMed запрашивает микрофон/камеру для онлайн-консультаций. Отзывайте эти разрешения в настройках ОС сразу после звонка для предотвращения фонового прослушивания.",
+    g_p6_title: "Отвяжите независимых родственников",
+    g_p6_desc: "DamuMed автоматически связывает профили семьи. Отвяжите совершеннолетних детей или родителей со своими смартфонами, чтобы предотвратить утечку данных при взломе одного устройства.",
+    g_p7_title: "Откажитесь от передачи данных аптекам",
+    g_p7_desc: "Явно откажитесь от передачи рецептов сторонним партнерским аптекам внутри приложения, так как нет никаких гарантий, что они когда-либо удалят ваши данные.",
+    g_p8_title: "Требуйте контроля со стороны человека",
+    g_p8_desc: "При назначении лечения на базе подсказок DamuMed, спросите врача: «Это рекомендация алгоритма (CDSS) или ваше независимое клиническое заключение?»",
+    g_p9_title: "Контролируйте запросы OTP",
+    g_p9_desc: "DamuMed использует SMS-коды. Если вы получили неожиданный код, это сигнал о попытке взлома профиля по ИИН (брутфорс). Немедленно обратитесь в поддержку.",
+    g_p10_title: "Официальный протокол удаления",
+    g_p10_desc: "Удаление приложения DamuMed с телефона не удаляет ваш медицинский профиль. Вы должны подать официальное заявление на удаление данных в администрацию клиники.",
+
+    g_s1_title: "PACS вместо WhatsApp",
+    g_s1_desc: "Прекратите пересылать рентгены в WhatsApp. Если в DamuMed нет быстрого просмотра DICOM, требуйте от ИТ внедрения защищенного локального PACS-чата, ссылаясь на закон о защите персональных данных.",
+    g_s2_title: "Документируйте отказы от алгоритма",
+    g_s2_desc: "Если вы не согласны с подсказкой Системы поддержки принятия решений (ИИ) DamuMed, задокументируйте свое клиническое обоснование в примечаниях, чтобы избежать алгоритмической ответственности.",
+    g_s3_title: "Остановите квотные приписки",
+    g_s3_desc: "Никогда не создавайте фиктивные приемы ради квот. Это отравляет централизованную базу данных, создавая эффект «мусор на входе — мусор на выходе» (GIGO) для будущих моделей ИИ.",
+    g_s4_title: "Блокируйте общие терминалы",
+    g_s4_desc: "Врачи делят ПК. Если вы отойдете, не выйдя из DamuMed, любая ошибка ИИ или человека, сделанная на этом терминале, будет юридически привязана к вашему ИИН.",
+    g_s5_title: "Прямой ввод ИИН",
+    g_s5_desc: "Никогда не фотографируйте удостоверения пациентов на личный телефон для последующего ввода в DamuMed. Это синхронизирует чувствительные данные с незащищенными облаками iCloud или Google Фото.",
+    g_s6_title: "Сообщайте об ошибках интерфейса",
+    g_s6_desc: "Если в выпадающем меню DamuMed нет нужного диагноза, не выбирайте «случайный» похожий. Пишите в ИТ-отдел. Неверные коды фатально искажают предиктивные модели ИИ.",
+    g_s7_title: "Информируйте пациентов об ИИ",
+    g_s7_desc: "Объясняя риски, рассчитанные инструментами DamuMed, юридически защитите себя фразой: «Система рассчитала это на основе вашей электронной истории болезни».",
+    g_s8_title: "Проверяйте сводные данные",
+    g_s8_desc: "DamuMed агрегирует анализы из сторонних частных клиник. Всегда перепроверяйте у пациента необычные внешние результаты, прежде чем ставить на их основе критический диагноз.",
+    g_s9_title: "Не ставьте приложение на личный телефон",
+    g_s9_desc: "Не устанавливайте приложение DamuMed Doctor на личный смартфон без корпоративного управления (MDM), на котором полно трекеров из социальных сетей.",
+    g_s10_title: "Никогда не передавайте смарт-карты",
+    g_s10_desc: "Если клиника использует аппаратные токены или ЭЦП для входа в DamuMed, никогда не оставляйте их в USB-порту на общем сестринском посту.",
+
+    g_i1_title: "Изолируйте телеметрию от истории болезни",
+    g_i1_desc: "Архитектурно отделите базу логов DamuMed (IP-адреса, ID сессий) от клинической базы данных (диагнозы), чтобы предотвратить деанонимизацию при SQL-инъекциях.",
+    g_i2_title: "Очистка EXIF на стороне сервера",
+    g_i2_desc: "Внедрите скрипты (например, ImageMagick), чтобы навсегда удалять GPS и метаданные устройств из загружаемых пациентами документов до их сохранения в хранилище.",
+    g_i3_title: "Аппаратный MFA для экстренного доступа",
+    g_i3_desc: "Врачи делятся паролями из-за медленного ввода. Внедрите быструю аппаратную MFA (NFC-бейджи или ключи FIDO2), чтобы исключить операционные оправдания для передачи паролей.",
+    g_i4_title: "Минимизация полезной нагрузки API e-Gov",
+    g_i4_desc: "Когда DamuMed запрашивает базу e-Gov для проверки ИИН, ограничьте API-запрос получением ТОЛЬКО токена валидации, а не всего генеалогического древа пациента.",
+    g_i5_title: "Журналы аудита алгоритмов (XAI)",
+    g_i5_desc: "Измените архитектуру системы CDSS, чтобы каждая рекомендация логировала точные входные переменные и уровень уверенности алгоритма для проведения аудитов врачебных ошибок.",
+    g_i6_title: "Контекстно-зависимый RBAC",
+    g_i6_desc: "Откажитесь от общих ролей «Врач» в пользу гранулярного доступа. Стоматолог в DamuMed не должен по умолчанию иметь доступ к психиатрической или онкологической истории.",
+    g_i7_title: "Автоматизированный TTL для партнеров",
+    g_i7_desc: "Внедрите строгие токены с истекающим сроком действия (Time-To-Live) для аптек. Они должны терять доступ к цифровому рецепту в секунду завершения транзакции.",
+    g_i8_title: "Интерфейс для оспаривания данных",
+    g_i8_desc: "Создайте защищенную кнопку «Оспорить запись» прямо в приложении DamuMed, которая направляет запросы на исправление данных во врачебную комиссию, минуя регистратуру.",
+    g_i9_title: "Анонимизация пайплайнов обучения ИИ",
+    g_i9_desc: "Обеспечьте, чтобы любые данные, передаваемые из баз DamuMed на серверы обучения ИИ, строго подвергались k-анонимизации с удалением точных ИИН и имен.",
+    g_i10_title: "Ограничение скорости поиска пациентов",
+    g_i10_desc: "Внедрите агрессивное ограничение запросов (rate-limiting) API в функции «Поиск пациента по ИИН», чтобы блокировать автоматический парсинг данных злоумышленниками.",
+
+    // XAI SIMULATOR
+    xai_title: "Симулятор прозрачности ИИ (XAI)",
+    xai_subtitle: "Наглядно сравните непрозрачный алгоритм (Черный ящик) и систему с журналом аудита (XAI).",
+    xai_params: "Данные пациента",
+    xai_bmi: "Индекс массы тела (ИМТ)",
+    xai_genetics: "Генетический риск",
+    xai_gen_low: "Низкий",
+    xai_gen_med: "Средний",
+    xai_gen_high: "Высокий",
+    xai_typo: "Симулировать опечатку (Вес 300 кг)",
+    xai_bb_title: "DamuMed: Черный ящик",
+    xai_bb_desc: "Система выдает только итоговый вердикт без объяснений.",
+    xai_bb_score: "Риск заболевания",
+    xai_audit_title: "Журнал аудита XAI",
+    xai_audit_badge: "Режим отладки",
+    xai_audit_desc: "Декомпозиция решения: из чего сложился процент риска.",
+    xai_bmi_risk: "Влияние ИМТ на риск",
+    xai_gen_risk: "Влияние генетики",
+    xai_typo_risk: "Аномалия: Ошибка ввода данных (Вес: 300кг)",
+
+    footer_copy: "© 2024 Центр цифровой безопасности · Диссертация MSc по кибербезопасности",
+    footer_note: "Только для академических и образовательных целей",
+  },
+
+  kk: {
+    tab_research: "Зерттеу нәтижелері",
+    tab_policy: "Саясат декодері",
+    tab_guidelines: "Қауіпсіздік нұсқаулары",
+    tab_xai: "XAI Симуляторы",
+
+    hero_tag: "Киберқауіпсіздік магистратурасы · DamuMed құпиялылық аудиті",
+    hero_title: "Цифрлық қауіпсіздік орталығы",
+    hero_subtitle: "Қазақстанның DamuMed денсаулық сақтау қосымшасындағы цифрлық құпиялылық пен қауіпсіздік туралы 162 пайдаланушымен 30 күндік сауалнаманың эмпирикалық нәтижелері.",
+    hero_stat_users: "Сауалнама қатысушылары",
+    hero_stat_days: "Күндік зерттеу",
+    hero_stat_risks: "Анықталған тәуекелдер",
+
+    research_title: "Зерттеу нәтижелері",
+    research_subtitle: "Бастапқы сауалнаманың эмпирикалық деректері — төрт пайдаланушы тобынан 162 респондент.",
+
+    stat1_title: "Демография",
+    stat1_sub: "4 рөлдік топтан 162 сауалнама қатысушысы",
+    demo_patients: "Науқастар",
+    demo_staff: "Медицина қызметкерлері",
+    demo_public: "Жалпы халық",
+    demo_it: "IT мамандары",
+
+    s2_title: "Оқыту алшақтығы",
+    s2_val: "54%",
+    s2_desc: "денсаулық сақтау қызметкерлері цифрлық құпиялылық бойынша ресми оқытудан ешқашан өтпеген.",
+    s2_color: "danger",
+    s3_title: "Көлеңкелі IT эпидемиясы",
+    s3_val: "69%",
+    s3_desc: "медицина қызметкерлері қауіпсіздікті айналып өтіп, пациент деректерін жеке мессенджерлер арқылы (WhatsApp/Telegram) жібереді.",
+    s3_color: "danger",
+    s4_title: "Тіркелгі деректерін бөлісу",
+    s4_val: "25%",
+    s4_desc: "дәрігерлер уақытты үнемдеу үшін DamuMed құпия сөздерін әріптестерімен ашық бөліседі.",
+    s4_color: "warn",
+    s5_title: "Келісімнің иллюзиясы",
+    s5_val: "84%",
+    s5_desc: "пайдаланушылар Құпиялылық саясатын толық оқымай-ақ мұқият қабылдайды.",
+    s5_color: "danger",
+    s6_title: "Метадеректерден хабарсыздық",
+    s6_val: "45%",
+    s6_desc: "қосымшаның GPS пен құрылғы деректерін бақылайтынынан мүлдем хабарсыз.",
+    s6_color: "warn",
+    s7_title: "Түзету блокадасы",
+    s7_val: "71%",
+    s7_desc: "медициналық жазбалардағы қателерді түзетуді қиын немесе мүмкін емес деп санайды.",
+    s7_color: "danger",
+    s8_title: "ЖИ қара жәшігі",
+    s8_val: "82%",
+    s8_desc: "ЖИ болжамдар үшін қандай жеке деректерді пайдаланатынын толық түсінбейді.",
+    s8_color: "danger",
+    s9_title: "ЖИ-ге төмен сенім",
+    s9_val: "2.71/5",
+    s9_desc: "ЖИ диагностикасына базалық сенім деңгейі сыни тұрғыдан төмен — қабылданатын шектерден әлдеқайда төмен.",
+    s9_color: "warn",
+    s10_title: "Ашықтық талабы",
+    s10_val: "90%",
+    s10_desc: "ЖИ денсаулық деректерін өңдеген кезде міндетті хабарламалар талап етеді.",
+    s10_color: "default",
+
+    policy_title: "Құпиялылық саясаты декодері",
+    policy_subtitle: "DamuMed Құпиялылық саясатынан 10 маңызды талдау тармағы — тармақтардың нақты мағынасы және тасымалдайтын тәуекелдері.",
+    risk_critical: "Сыни",
+    risk_high: "Жоғары",
+    risk_medium: "Орташа",
+    policy_legend_note: "← Сол жақ жиек түсі — тәуекел ауырлығын білдіреді",
+
+    p1_concept: "Деректерді шамадан тыс жинау",
+    p1_clause: "Қосымша ЖСН, GPS, отбасылық қарым-қатынас деректерін жинайды.",
+    p1_meaning: "GDPR деректерді азайту принципін бұзады — негізгі функционал үшін қажеттіден әлдеқайда көп жиналады.",
+    p1_risk: "HIGH",
+    p2_concept: "Метадеректерді шығару",
+    p2_clause: "Жүктелген фотосуреттерден EXIF деректерін (уақыт және орын) шығарады.",
+    p2_meaning: "Пайдаланушы GPS-ті қолмен өшірсе де, жанама бақылау белсенді болып қалады.",
+    p2_risk: "HIGH",
+    p3_concept: "Құрылғы саусақ іздері",
+    p3_clause: "ОЖ нұсқасы мен дәл аппараттық идентификаторларды жинайды.",
+    p3_meaning: "Анонимдік техникалық тұрғыдан мүмкін емес; денсаулық жазбалары физикалық аппаратурамен тұрақты байланыстырылады.",
+    p3_risk: "CRITICAL",
+    p4_concept: "Түсініксіз ЖИ өңдеу",
+    p4_clause: "«Деректер талдау үшін пайдаланылады».",
+    p4_meaning: "Пайдаланушы деректері деректер субъектісінің нақты алгоритмдік келісімінсіз меншікті ЖИ модельдерін үйретеді.",
+    p4_risk: "CRITICAL",
+    p5_concept: "Автономияны бұзу",
+    p5_clause: "Тіркеу деректерінің өрістері бұғатталған және өңделмейді.",
+    p5_meaning: "Пайдаланушылар қателерді түзете алмайды, бұл ЖИ-ге дұрыс емес деректерді үйренуге мәжбүр етеді (Қоқыс кіреді — қоқыс шығады).",
+    p5_risk: "HIGH",
+    p6_concept: "Деректерді мерзімсіз сақтау",
+    p6_clause: "«Қажет болған жерде сақталады».",
+    p6_meaning: "Нақты жою мерзімдері анықталмаған — деректерді қорғау заңнамасының сақтауды шектеу принципін бұзады.",
+    p6_risk: "HIGH",
+    p7_concept: "Бақылаусыз серіктес бөлісу",
+    p7_clause: "Деректер серіктес аптекалар мен клиникалармен бөлісіледі.",
+    p7_meaning: "Үшінші тараптардың деректерді жоятынына ешқандай кепілдіксіз бақылаусыз деректер таралуын тудырады.",
+    p7_risk: "MEDIUM",
+    p8_concept: "Аппараттық қол жетімділік",
+    p8_clause: "Қосымша камера мен микрофонға қол жетімділік талап етеді.",
+    p8_meaning: "Үздіксіз аппараттық қол жетімділігі бар меншікті бағдарламалық жасақтама фондық тыңшылық тәуекел векторларын енгізеді.",
+    p8_risk: "MEDIUM",
+    p9_concept: "Мемлекеттік мәліметтер базасымен байланыс",
+    p9_clause: "Азаматтардың e-Gov профильдеріне тікелей байланыстырылған.",
+    p9_meaning: "Киберқылмыскерлер үшін тартымды, жоғары құнды нысана болып табылатын орасан зор орталықтандырылған «бал ыдысын» жасайды.",
+    p9_risk: "CRITICAL",
+    p10_concept: "Ашықтықтың болмауы",
+    p10_clause: "Құпиялылық саясатында ЖИ шешімдер логикасы туралы еш нәрсе айтылмаған.",
+    p10_meaning: "ЖИ диагностикалық қателерін тәуелсіз аудитке және алгоритмдік зиян үшін есеп беруге мүмкіндік бермейді.",
+    p10_risk: "HIGH",
+
+    guide_title: "Қауіпсіздік нұсқаулары",
+    guide_subtitle: "30 іс-қимыл ұсынымы — әр рөл үшін 10. Тексерілді деп белгілеу үшін элементті басыңыз.",
+    role_patients: "Науқастар",
+    role_staff: "Медперсонал",
+    role_it: "IT және Әкімшілер",
+
+    g_p1_title: "Жүктеулерден EXIF-ті өшіріңіз",
+    g_p1_desc: "DamuMed саясаты жүктелген фотосуреттерден метадеректерді алуға рұқсат береді. Қосымшаға жүктемес бұрын медициналық талдауларыңыздың суреттерінен геолокация деректерін өшіріңіз.",
+    g_p2_title: "«Жалған қабылдауларды» тексеріңіз",
+    g_p2_desc: "DamuMed-те квота үшін жасалған «жалған қабылдаулар» жиі кездеседі. Тарихыңызды үнемі тексеріңіз. Жалған визиттер денсаулық болжамын жасайтын ЖИ-ді қате деректермен оқытады.",
+    g_p3_title: "e-Otinish арқылы шағымданыңыз",
+    g_p3_desc: "Егер тіркеу бөлімі DamuMed профиліңіздегі қате деректерді өшіруден бас тартса, берілмеңіз. Оларды заңды орындауға мәжбүрлеу үшін 'e-Otinish' порталы арқылы ресми шағым түсіріңіз.",
+    g_p4_title: "e-Gov нөмірлерін оқшаулаңыз",
+    g_p4_desc: "DamuMed сіздің ЖСН арқылы Мобильді азаматтар базасымен байланысты. SIM-свопинг (нөмірді ұрлау) қаупін азайту үшін медициналық қосымшалар мен банкингке бөлек телефон нөмірін пайдаланыңыз.",
+    g_p5_title: "Телемедицинадан кейін рұқсатты жойыңыз",
+    g_p5_desc: "DamuMed қашықтан кеңес беру үшін микрофон/камераға рұқсат сұрайды. Жасырын тыңдауды болдырмас үшін қоңырау аяқталған бойда ОЖ параметрлерінен осы рұқсаттарды өшіріңіз.",
+    g_p6_title: "Тәуелсіз туыстарды ажыратыңыз",
+    g_p6_desc: "DamuMed отбасы профильдерін автоматты түрде байланыстырады. Бір құрылғы бұзылған жағдайда деректердің таралуын болдырмау үшін өз құрылғысы бар ересек балаларды немесе ата-аналарды ажыратыңыз.",
+    g_p7_title: "Дәріханалармен дерек бөлісуден бас тартыңыз",
+    g_p7_desc: "Қосымша ішінде рецепттерді үшінші тарап серіктес дәріханалармен бөлісуден бас тартыңыз, себебі олардың сіздің деректеріңізді жоятынына ешқандай кепілдік жоқ.",
+    g_p8_title: "Адамның бақылауын талап етіңіз",
+    g_p8_desc: "DamuMed ұсынысы негізінде дәрі-дәрмек тағайындалса, дәрігерден: «Бұл алгоритмнің ұсынысы ма, әлде сіздің тәуелсіз клиникалық қорытындыңыз ба?» деп сұраңыз.",
+    g_p9_title: "OTP сұрауларын бақылаңыз",
+    g_p9_desc: "DamuMed SMS-кодтарды (OTP) пайдаланады. Егер күтпеген код келсе, бұл сіздің ЖСН бойынша аккаунтыңызды бұзу әрекетін білдіреді. Дереу қолдау қызметіне хабарласыңыз.",
+    g_p10_title: "Ресми түрде жою хаттамасы",
+    g_p10_desc: "DamuMed қосымшасын телефоннан өшіру сіздің медициналық профиліңізді жоймайды. Деректерді жою үшін емхана әкімшілігіне ресми өтініш беруіңіз керек.",
+
+    g_s1_title: "WhatsApp орнына PACS",
+    g_s1_desc: "Рентген суреттерін WhatsApp арқылы жіберуді тоқтатыңыз. Егер DamuMed-те жылдам DICOM көру мүмкіндігі болмаса, дербес деректер туралы заңға сілтеме жасай отырып, АТ-тан қауіпсіз локалды PACS-чат орнатуды талап етіңіз.",
+    g_s2_title: "Алгоритмнен бас тартуды құжаттаңыз",
+    g_s2_desc: "Егер DamuMed-тің Шешім қабылдауды қолдау жүйесінің (ЖИ) ұсынысымен келіспесеңіз, алгоритмдік жауапкершілікті болдырмау үшін клиникалық негіздемеңізді міндетті түрде жазбаларға енгізіңіз.",
+    g_s3_title: "Жалған квоталарды тоқтатыңыз",
+    g_s3_desc: "Квотаны толтыру үшін ешқашан жалған қабылдаулар жасамаңыз. Бұл орталықтандырылған ұлттық базаны улап, болашақ ЖИ модельдері үшін «Қоқыс кірсе — қоқыс шығады» (GIGO) әсерін тудырады.",
+    g_s4_title: "Ортақ терминалдарды бұғаттаңыз",
+    g_s4_desc: "Дәрігерлер ортақ ДК пайдаланады. Егер DamuMed-тен шықпай орныңыздан кетсеңіз, сол терминалда жасалған кез келген ЖИ немесе адам қатесі заң жүзінде сіздің ЖСН-ге тіркеледі.",
+    g_s5_title: "ЖСН-ді тікелей енгізу",
+    g_s5_desc: "Кейінірек DamuMed-ке енгізу үшін ешқашан пациенттердің жеке куәліктерін жеке телефоныңызға суретке түсірмеңіз. Бұл құпия деректерді қорғалмаған iCloud немесе Google Фото-ға синхрондайды.",
+    g_s6_title: "Интерфейс ақауларын хабарлаңыз",
+    g_s6_desc: "Егер DamuMed мәзірінде қажетті диагноз болмаса, «кездейсоқ» ұқсас нұсқаны таңдамаңыз. АТ-бөліміне жазыңыз. Қате кодтар ЖИ предиктивті модельдерін қатты бұрмалайды.",
+    g_s7_title: "Пациенттерге ЖИ туралы ескертіңіз",
+    g_s7_desc: "DamuMed болжам құралдарымен есептелген тәуекелдерді түсіндірген кезде, пациентке: «Жүйе мұны сіздің электронды тарихыңыз негізінде есептеді» деп айту арқылы өзіңізді заңды түрде қорғаңыз.",
+    g_s8_title: "Жиынтық деректерді тексеріңіз",
+    g_s8_desc: "DamuMed басқа жеке емханалардың талдауларын жинақтайды. Маңызды диагноз қоймас бұрын, күдікті сыртқы нәтижелерді әрқашан пациентпен бірге қайта тексеріңіз.",
+    g_s9_title: "Жеке телефонға қосымша орнатпаңыз",
+    g_s9_desc: "Корпоративтік басқару (MDM) жүйесі жоқ және әлеуметтік желі трекерлеріне толы жеке смартфоныңызға DamuMed Doctor қосымшасын орнатпаңыз.",
+    g_s10_title: "Смарт-карталарды ешқашан бермеңіз",
+    g_s10_desc: "Егер емхана DamuMed-ке кіру үшін аппараттық токенттерді немесе ЭЦҚ қолданса, оларды ешқашан ортақ медбике постының USB-портында қалдырмаңыз.",
+
+    g_i1_title: "Телеметрияны ауру тарихынан бөліңіз",
+    g_i1_desc: "SQL-инъекция кезінде деанонимизацияны болдырмау үшін DamuMed логтар базасын (IP-адрестер, сессия ID) клиникалық дерекқордан (диагноздар) архитектуралық тұрғыда бөліңіз.",
+    g_i2_title: "Серверде EXIF деректерін тазалау",
+    g_i2_desc: "Пациенттер жүктеген барлық құжаттардан GPS және құрылғы метадеректерін сақтау қоймасына түспес бұрын жоятын автоматтандырылған скрипттерді (мыс., ImageMagick) енгізіңіз.",
+    g_i3_title: "Аппараттық MFA қолдану",
+    g_i3_desc: "Дәрігерлер терудің қиындығынан парольдермен бөліседі. Бұған жол бермеу үшін бір рет басылатын жылдам аппараттық MFA (NFC-бейджиктер немесе FIDO2 кілттері) енгізіңіз.",
+    g_i4_title: "e-Gov API жүктемесін минимизациялау",
+    g_i4_desc: "DamuMed ЖСН тексеру үшін e-Gov базасына сұрау жіберген кезде, бүкіл генеалогиялық ағашты емес, ТЕК валидация токенін алатындай етіп API-ді шектеңіз.",
+    g_i5_title: "Алгоритмдік аудит журналдары (XAI)",
+    g_i5_desc: "Шешім қабылдауды қолдау жүйесінің (CDSS) архитектурасын өзгертіңіз, сонда ЖИ-дің әрбір ұсынысы кіріс айнымалыларын және сенімділік деңгейін тіркеп отырады.",
+    g_i6_title: "Контекстке негізделген RBAC",
+    g_i6_desc: "Жалпылама «Дәрігер» рөлдерінен нақтыланған рұқсаттарға көшіңіз. DamuMed қолданатын тіс дәрігерінде пациенттің психиатриялық немесе онкологиялық тарихына әдепкі рұқсат болмауы тиіс.",
+    g_i7_title: "Серіктестер үшін автоматты TTL",
+    g_i7_desc: "Үшінші тарап дәріханалары үшін жарамдылық мерзімі қатаң API токендерін (Time-To-Live) енгізіңіз. Олар транзакция аяқталған сәтте цифрлық рецептке қолжетімділікті жоғалтуы керек.",
+    g_i8_title: "Оспарлауға арналған UI",
+    g_i8_desc: "DamuMed пациент қосымшасының ішінен тіркеу бөлімін айналып өтіп, деректерді түзету сұрауларын тікелей дәрігерлік комиссияға бағыттайтын қауіпсіз «Жазбаны даулау» түймесін жасаңыз.",
+    g_i9_title: "ЖИ оқыту пайплайндарын анонимдеу",
+    g_i9_desc: "DamuMed операциялық базаларынан ЖИ оқыту серверлеріне тасымалданатын кез келген деректер k-анонимділікке қатаң бағынып, нақты ЖСН мен аты-жөндерді жоюын қамтамасыз етіңіз.",
+    g_i10_title: "Пациенттерді іздеу жылдамдығын шектеу",
+    g_i10_desc: "Деректерді автоматты түрде жинауды (парсинг) бұғаттау үшін «Пациентті ЖСН бойынша іздеу» функциясына агрессивті API rate-limiting және аномалияларды анықтау жүйесін енгізіңіз.",
+
+    // XAI SIMULATOR
+    xai_title: "Түсіндірмелі ЖИ (XAI) Симуляторы",
+    xai_subtitle: "Бұлыңғыр алгоритм мен аудит журналы бар жүйені салыстырыңыз.",
+    xai_params: "Пациент деректері",
+    xai_bmi: "Дене салмағының индексі (ДСИ)",
+    xai_genetics: "Генетикалық қауіп",
+    xai_gen_low: "Төмен",
+    xai_gen_med: "Орташа",
+    xai_gen_high: "Жоғары",
+    xai_typo: "Қатені симуляциялау (Салмағы 300 кг)",
+    xai_bb_title: "DamuMed: Қара жәшік",
+    xai_bb_desc: "Жүйе себептерін түсіндірмей тек соңғы үкімді шығарады.",
+    xai_bb_score: "Ауру қаупі",
+    xai_audit_title: "XAI Аудит журналы",
+    xai_audit_badge: "Жөндеу режимі",
+    xai_audit_desc: "Шешім декомпозициясы: қауіп пайызы қалай есептелді.",
+    xai_bmi_risk: "ДСИ әсері",
+    xai_gen_risk: "Генетика әсері",
+    xai_typo_risk: "Аномалия: Деректерді енгізу қатесі (Салмағы: 300кг)",
+
+    footer_copy: "© 2024 Цифрлық қауіпсіздік орталығы · Киберқауіпсіздік магистратурасы диссертациясы",
+    footer_note: "Тек академиялық және білім беру мақсаттары үшін",
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentLang = 'ru'; // По умолчанию пусть будет русский
+let currentTab = 'research';
+let currentSubTab = 'patients';
+
+// ============================================================
+// STAT CARDS CONFIG
+// ============================================================
+const statCards = [
+  { key: 's2', icon: 'graduation-cap', iconColor: 'var(--accent-red)' },
+  { key: 's3', icon: 'message-circle-warning', iconColor: 'var(--accent-red)' },
+  { key: 's4', icon: 'key', iconColor: 'var(--accent-amber)' },
+  { key: 's5', icon: 'eye-off', iconColor: 'var(--accent-red)' },
+  { key: 's6', icon: 'map-pin-off', iconColor: 'var(--accent-amber)' },
+  { key: 's7', icon: 'file-x', iconColor: 'var(--accent-red)' },
+  { key: 's8', icon: 'cpu', iconColor: 'var(--accent-red)' },
+  { key: 's9', icon: 'bot', iconColor: 'var(--accent-amber)' },
+  { key: 's10', icon: 'bell-ring', iconColor: 'var(--accent-teal)' },
+];
+
+// ============================================================
+// POLICY CONFIG
+// ============================================================
+const policies = [
+  { key: 'p1', risk: 'HIGH' },
+  { key: 'p2', risk: 'HIGH' },
+  { key: 'p3', risk: 'CRITICAL' },
+  { key: 'p4', risk: 'CRITICAL' },
+  { key: 'p5', risk: 'HIGH' },
+  { key: 'p6', risk: 'HIGH' },
+  { key: 'p7', risk: 'MEDIUM' },
+  { key: 'p8', risk: 'MEDIUM' },
+  { key: 'p9', risk: 'CRITICAL' },
+  { key: 'p10', risk: 'HIGH' },
+];
+
+// ============================================================
+// GUIDELINE CONFIG
+// ============================================================
+const guideRoles = {
+  patients: ['g_p1','g_p2','g_p3','g_p4','g_p5','g_p6','g_p7','g_p8','g_p9','g_p10'],
+  staff:    ['g_s1','g_s2','g_s3','g_s4','g_s5','g_s6','g_s7','g_s8','g_s9','g_s10'],
+  it:       ['g_i1','g_i2','g_i3','g_i4','g_i5','g_i6','g_i7','g_i8','g_i9','g_i10'],
+};
+const checkedItems = new Set();
+
+// ============================================================
+// RENDER HELPERS
+// ============================================================
+function t(key) { return (T[currentLang] && T[currentLang][key]) || T['en'][key] || key; }
+
+function updateTranslations() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-t'));
+  });
+}
+
+function renderStatCards() {
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+  statCards.forEach(cfg => {
+    const val = t(cfg.key + '_val');
+    const col = t(cfg.key + '_color');
+    const numClass = col === 'danger' ? 'danger' : col === 'warn' ? 'warn' : '';
+    const barClass = col === 'danger' ? 'danger' : col === 'warn' ? 'warn' : '';
+    // parse numeric pct
+    const numStr = val.replace('%','').replace('/5','');
+    const num = parseFloat(numStr);
+    let pct = 0;
+    if (val.includes('%')) pct = Math.min(num, 100);
+    else if (val.includes('/5')) pct = (num / 5) * 100;
+
+    const card = document.createElement('div');
+    card.className = 'glass-card p-6 fade-up';
+    card.innerHTML = `
+      <div class="flex items-start justify-between mb-4">
+        <div class="icon-circle" style="background:rgba(255,255,255,0.05)">
+          <i data-lucide="${cfg.icon}" style="color:${cfg.iconColor};width:20px;height:20px"></i>
+        </div>
+        <span class="stat-number ${numClass}">${val}</span>
+      </div>
+      <div class="font-display font-bold text-sm mb-1">${t(cfg.key + '_title')}</div>
+      <p class="text-xs mb-4" style="color:var(--text-secondary)">${t(cfg.key + '_desc')}</p>
+      ${pct > 0 ? `<div class="progress-track"><div class="progress-fill ${barClass}" style="width:${pct}%"></div></div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+  lucide.createIcons();
+}
+
+function riskLabel(risk) {
+  const map = { CRITICAL: 'risk_critical', HIGH: 'risk_high', MEDIUM: 'risk_medium' };
+  return t(map[risk] || 'risk_medium');
+}
+function riskBadgeClass(risk) {
+  const map = { CRITICAL: 'badge-critical', HIGH: 'badge-high', MEDIUM: 'badge-medium' };
+  return map[risk] || 'badge-medium';
+}
+function riskRowClass(risk) {
+  const map = { CRITICAL: 'critical', HIGH: 'high', MEDIUM: 'medium' };
+  return map[risk] || 'medium';
+}
+function riskIcon(risk) {
+  const map = { CRITICAL: 'alert-octagon', HIGH: 'alert-triangle', MEDIUM: 'info' };
+  return map[risk] || 'info';
+}
+
+function renderPolicy() {
+  const list = document.getElementById('policy-list');
+  list.innerHTML = '';
+  policies.forEach((pol, idx) => {
+    const row = document.createElement('div');
+    row.className = `policy-row ${riskRowClass(pol.risk)} fade-up`;
+    row.style.animationDelay = `${idx * 0.05}s`;
+    row.innerHTML = `
+      <div class="flex items-start gap-4 flex-wrap md:flex-nowrap">
+        <div class="flex-shrink-0 flex items-center gap-3">
+          <span class="font-mono text-xs" style="color:var(--text-dim);min-width:24px">${String(idx+1).padStart(2,'0')}</span>
+          <div class="icon-circle" style="background:rgba(255,255,255,0.04);width:36px;height:36px">
+            <i data-lucide="${riskIcon(pol.risk)}" style="width:16px;height:16px;color:${pol.risk==='CRITICAL'?'var(--accent-red)':pol.risk==='HIGH'?'var(--accent-orange)':'var(--accent-amber)'}"></i>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3 flex-wrap mb-2">
+            <span class="font-display font-bold text-sm">${t(pol.key + '_concept')}</span>
+            <span class="badge ${riskBadgeClass(pol.risk)}">● ${riskLabel(pol.risk)}</span>
+          </div>
+          <div class="flex items-start gap-2 mb-2">
+            <i data-lucide="quote" style="width:12px;height:12px;flex-shrink:0;margin-top:4px;color:var(--text-dim)"></i>
+            <p class="text-xs italic" style="color:var(--text-dim)">${t(pol.key + '_clause')}</p>
+          </div>
+          <div class="flex items-start gap-2">
+            <i data-lucide="arrow-right" style="width:12px;height:12px;flex-shrink:0;margin-top:4px;color:var(--accent-cyan)"></i>
+            <p class="text-sm" style="color:var(--text-secondary)">${t(pol.key + '_meaning')}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+  lucide.createIcons();
+}
+
+function renderGuidePanel(role) {
+  const panel = document.getElementById('guide-' + role);
+  const keys = guideRoles[role];
+  panel.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+  keys.forEach((key, idx) => {
+    const id = role + '-' + idx;
+    const isDone = checkedItems.has(id);
+    const item = document.createElement('div');
+    item.className = `check-item${isDone ? ' done' : ''} fade-up`;
+    item.style.animationDelay = `${idx * 0.04}s`;
+    item.setAttribute('data-id', id);
+    item.onclick = function() {
+      if (checkedItems.has(id)) checkedItems.delete(id);
+      else checkedItems.add(id);
+      this.classList.toggle('done');
+      const box = this.querySelector('.check-box');
+      if (checkedItems.has(id)) {
+        box.innerHTML = `<i data-lucide="check" style="width:12px;height:12px;color:#05080f"></i>`;
+      } else {
+        box.innerHTML = '';
+      }
+      lucide.createIcons();
+    };
+    item.innerHTML = `
+      <div class="check-box${isDone ? '' : ''}">${isDone ? `<i data-lucide="check" style="width:12px;height:12px;color:#05080f"></i>` : ''}</div>
+      <div class="min-w-0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span class="check-num">${String(idx+1).padStart(2,'0')}</span>
+          <span class="font-display font-bold text-sm">${t(key + '_title')}</span>
+        </div>
+        <p class="text-xs" style="color:var(--text-secondary)">${t(key + '_desc')}</p>
+      </div>
+    `;
+    grid.appendChild(item);
+  });
+  panel.appendChild(grid);
+  lucide.createIcons();
+}
+
+function renderAllGuides() {
+  ['patients','staff','it'].forEach(r => renderGuidePanel(r));
+}
+
+// ============================================================
+// XAI SIMULATOR LOGIC
+// ============================================================
+function updateXAI() {
+  const bmi = parseInt(document.getElementById('xai-bmi').value);
+  const gen = parseInt(document.getElementById('xai-genetics').value);
+  const isTypo = document.getElementById('xai-typo').checked;
+
+  document.getElementById('xai-bmi-val').innerText = bmi;
+
+  // Рассчитываем базовый риск от ИМТ (от 15 до 50)
+  // Норма (около 20) даст около 5% риска. ИМТ 50 даст 40%.
+  let bmiRisk = Math.floor(((bmi - 15) / 35) * 40);
+  if (bmiRisk < 0) bmiRisk = 0;
+
+  let typoRisk = isTypo ? 45 : 0; // Опечатка накидывает 45% сверху
+  
+  let totalRisk = bmiRisk + gen + typoRisk;
+  if (totalRisk > 100) totalRisk = 100;
+
+  // Обновляем "Черный Ящик"
+  const bbScore = document.getElementById('blackbox-score');
+  bbScore.innerText = totalRisk + '%';
+  if (totalRisk >= 70) {
+    bbScore.style.color = 'var(--accent-red)';
+  } else if (totalRisk >= 40) {
+    bbScore.style.color = 'var(--accent-amber)';
+  } else {
+    bbScore.style.color = 'var(--accent-teal)';
+  }
+
+  // Обновляем "Журнал Аудита XAI"
+  document.getElementById('xai-bmi-bar').style.width = bmiRisk + '%';
+  document.getElementById('xai-bmi-bar-val').innerText = bmiRisk + '%';
+
+  document.getElementById('xai-gen-bar').style.width = gen + '%';
+  document.getElementById('xai-gen-bar-val').innerText = gen + '%';
+
+  const typoContainer = document.getElementById('xai-typo-container');
+  if (isTypo) {
+    typoContainer.style.display = 'block';
+    document.getElementById('xai-typo-bar').style.width = typoRisk + '%';
+    document.getElementById('xai-typo-bar-val').innerText = '+' + typoRisk + '%';
+  } else {
+    typoContainer.style.display = 'none';
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+  ['research','policy','guidelines','xai'].forEach(t => {
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'policy') renderPolicy();
+  if (tab === 'guidelines') renderAllGuides();
+  if (tab === 'xai') updateXAI();
+}
+
+function switchSubTab(role) {
+  currentSubTab = role;
+  ['patients','staff','it'].forEach(r => {
+    const el = document.getElementById('guide-' + r);
+    el.style.display = r === role ? 'block' : 'none';
+    document.getElementById('subtab-' + r).classList.toggle('active', r === role);
+  });
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  ['en','ru','kk'].forEach(l => {
+    document.getElementById('lang-' + l).classList.toggle('active', l === lang);
+  });
+  updateTranslations();
+  renderStatCards();
+  if (currentTab === 'policy') renderPolicy();
+  if (currentTab === 'guidelines') renderAllGuides();
+  if (currentTab === 'xai') updateXAI();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  setLang('ru'); // Начинаем с русского языка
+  
+  // Анимация прогресс баров при первой загрузке
+  setTimeout(() => {
+    document.querySelectorAll('.progress-fill').forEach(el => {
+      const w = el.style.width;
+      el.style.width = '0%';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { el.style.width = w; });
+      });
+    });
+  }, 100);
+});
+</script>
+</body>
+</html>
