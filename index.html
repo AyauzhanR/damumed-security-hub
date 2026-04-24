@@ -55,7 +55,7 @@
   .font-display { font-family: 'Syne', sans-serif; }
   .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-  /* GLASS CARD */
+  
   .glass-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -78,7 +78,7 @@
     transform: translateY(-2px);
   }
 
-  /* TABS */
+  
   .main-tab-btn {
     font-family: 'Syne', sans-serif;
     font-weight: 600;
@@ -116,7 +116,7 @@
     border-color: rgba(0,229,192,0.2);
   }
 
-  /* RISK BADGES */
+  
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
     font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500;
@@ -127,7 +127,7 @@
   .badge-high     { background: rgba(255,122,0,0.15);  color: #ff7a00; border: 1px solid rgba(255,122,0,0.3); }
   .badge-medium   { background: rgba(255,183,0,0.12);  color: #ffb700; border: 1px solid rgba(255,183,0,0.25); }
 
-  /* PROGRESS BAR */
+  
   .progress-track {
     height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden;
   }
@@ -140,7 +140,7 @@
   .progress-fill.danger { background: linear-gradient(90deg, #ff3b5c, #ff7a00); box-shadow: 0 0 12px rgba(255,59,92,0.5); }
   .progress-fill.warn   { background: linear-gradient(90deg, #ffb700, #ff7a00); box-shadow: 0 0 12px rgba(255,183,0,0.5); }
 
-  /* STAT CARD */
+  
   .stat-number {
     font-family: 'Syne', sans-serif; font-size: 2.6rem; font-weight: 800;
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
@@ -156,7 +156,7 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
 
-  /* CHECKLIST */
+  
   .check-item {
     display: flex; gap: 14px; align-items: flex-start;
     padding: 14px 18px; border-radius: 12px;
@@ -177,7 +177,7 @@
     margin-top: 3px; min-width: 20px;
   }
 
-  /* POLICY ROW */
+  
   .policy-row {
     padding: 18px 20px; border-radius: 14px;
     border: 1px solid var(--border); background: var(--bg-glass);
@@ -192,7 +192,7 @@
   .policy-row.medium::before  { background: var(--accent-amber); }
   .policy-row:hover { border-color: var(--border-glow); transform: translateX(4px); }
 
-  /* LANG SWITCHER */
+  
   .lang-btn {
     font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
     letter-spacing: 0.1em; padding: 6px 12px; border-radius: 8px;
@@ -202,12 +202,12 @@
   .lang-btn:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
   .lang-btn.active { color: var(--accent-cyan); border-color: rgba(0,200,255,0.35); background: rgba(0,200,255,0.07); }
 
-  /* SCROLL */
+  
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
 
-  /* ANIMATIONS */
+  
   @keyframes fadeUp {
     from { opacity:0; transform:translateY(18px); }
     to   { opacity:1; transform:translateY(0); }
@@ -223,7 +223,7 @@
   }
   .pulse { animation: pulse-glow 3s ease infinite; }
 
-  /* SCAN LINE HEADER EFFECT */
+  
   .scan-line {
     position: relative; overflow: hidden;
   }
@@ -235,14 +235,14 @@
   }
   @keyframes scan { 0%{left:-60%} 100%{left:160%} }
 
-  /* HEADER GLOW LINE */
+  
   .glow-line {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-teal), transparent);
     opacity: 0.4;
   }
 
-  /* TOOLTIP */
+  
   .tooltip-wrap { position: relative; }
   .tooltip-wrap .tooltip-box {
     display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
@@ -253,27 +253,27 @@
   }
   .tooltip-wrap:hover .tooltip-box { display: block; }
 
-  /* SECTION DIVIDER */
+  
   .divider { height: 1px; background: var(--border); margin: 8px 0; }
 
-  /* ICON CIRCLE */
+  
   .icon-circle {
     width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
-  /* TAG */
+  
   .tag {
     font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
     padding: 2px 8px; border-radius: 4px;
     background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border);
   }
 
-  /* HIDDEN */
+ 
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* HEADER BRAND */
+  
   .brand-logo {
     width: 36px; height: 36px; border-radius: 10px;
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
@@ -281,7 +281,7 @@
     box-shadow: 0 0 20px rgba(0,200,255,0.3);
   }
 
-  /* COUNTER ANIMATION */
+  
   .counting { transition: none; }
 </style>
 </head>
@@ -548,9 +548,7 @@
 </div>
 
 <script>
-// ============================================================
-// TRANSLATION DICTIONARY
-// ============================================================
+
 const T = {
   en: {
     tab_research: "Research Insights",
@@ -575,7 +573,7 @@ const T = {
     demo_public: "General Public",
     demo_it: "IT Professionals",
 
-    // Stat cards data
+    
     s2_title: "The Training Gap",
     s2_val: "54%",
     s2_desc: "of healthcare users have NEVER received official digital privacy training.",
@@ -667,7 +665,7 @@ const T = {
     role_staff: "Medical Staff",
     role_it: "IT & Admins",
 
-    // PATIENTS
+    
     g_p1_title: "Scrub EXIF from Uploads",
     g_p1_desc: "DamuMed's policy allows extracting metadata from uploaded photos. Strip location data from pictures of your medical tests before uploading them to the app.",
     g_p2_title: "Audit for Phantom Visits",
@@ -689,7 +687,7 @@ const T = {
     g_p10_title: "Formal Deletion Protocol",
     g_p10_desc: "Deleting the DamuMed app from your phone does not delete your medical profile. You must submit a formal erasure request to your clinic's administration.",
 
-    // STAFF
+    
     g_s1_title: "PACS over WhatsApp",
     g_s1_desc: "Stop using WhatsApp for X-rays. If DamuMed lacks a fast DICOM viewer, formally request IT to deploy a secure local PACS chat, citing the RK Law on Personal Data.",
     g_s2_title: "Document Algorithm Overrides",
@@ -711,7 +709,7 @@ const T = {
     g_s10_title: "Never Share Smart Cards",
     g_s10_desc: "If your clinic uses hardware tokens or EDS (ЭЦП) for DamuMed access, never leave them plugged into the USB port of a shared nursing station.",
 
-    // IT
+    
     g_i1_title: "Decouple Telemetry from PHI",
     g_i1_desc: "Architecturally separate the DamuMed logging database (device IPs, session IDs) from the Clinical Database (diagnoses) to prevent trivial deanonymization during SQL injections.",
     g_i2_title: "Server-Side EXIF Scrubbing",
@@ -733,7 +731,7 @@ const T = {
     g_i10_title: "Rate-Limit Patient Search",
     g_i10_desc: "Implement aggressive API rate-limiting and anomaly detection on the 'Search Patient by IIN' function to block automated scraping by malicious internal or external actors.",
 
-    // XAI SIMULATOR
+    
     xai_title: "Explainable AI (XAI) Simulator",
     xai_subtitle: "Compare a Black Box algorithm with an auditable Explainable AI system.",
     xai_params: "Patient Parameters",
@@ -934,7 +932,7 @@ const T = {
     g_i10_title: "Ограничение скорости поиска пациентов",
     g_i10_desc: "Внедрите агрессивное ограничение запросов (rate-limiting) API в функции «Поиск пациента по ИИН», чтобы блокировать автоматический парсинг данных злоумышленниками.",
 
-    // XAI SIMULATOR
+    
     xai_title: "Симулятор прозрачности ИИ (XAI)",
     xai_subtitle: "Наглядно сравните непрозрачный алгоритм (Черный ящик) и систему с журналом аудита (XAI).",
     xai_params: "Данные пациента",
@@ -1135,7 +1133,7 @@ const T = {
     g_i10_title: "Пациенттерді іздеу жылдамдығын шектеу",
     g_i10_desc: "Деректерді автоматты түрде жинауды (парсинг) бұғаттау үшін «Пациентті ЖСН бойынша іздеу» функциясына агрессивті API rate-limiting және аномалияларды анықтау жүйесін енгізіңіз.",
 
-    // XAI SIMULATOR
+    
     xai_title: "Түсіндірмелі ЖИ (XAI) Симуляторы",
     xai_subtitle: "Бұлыңғыр алгоритм мен аудит журналы бар жүйені салыстырыңыз.",
     xai_params: "Пациент деректері",
@@ -1160,16 +1158,12 @@ const T = {
   }
 };
 
-// ============================================================
-// STATE
-// ============================================================
-let currentLang = 'ru'; // По умолчанию пусть будет русский
+
+let currentLang = 'en';
 let currentTab = 'research';
 let currentSubTab = 'patients';
 
-// ============================================================
-// STAT CARDS CONFIG
-// ============================================================
+
 const statCards = [
   { key: 's2', icon: 'graduation-cap', iconColor: 'var(--accent-red)' },
   { key: 's3', icon: 'message-circle-warning', iconColor: 'var(--accent-red)' },
@@ -1182,9 +1176,7 @@ const statCards = [
   { key: 's10', icon: 'bell-ring', iconColor: 'var(--accent-teal)' },
 ];
 
-// ============================================================
-// POLICY CONFIG
-// ============================================================
+
 const policies = [
   { key: 'p1', risk: 'HIGH' },
   { key: 'p2', risk: 'HIGH' },
@@ -1198,9 +1190,7 @@ const policies = [
   { key: 'p10', risk: 'HIGH' },
 ];
 
-// ============================================================
-// GUIDELINE CONFIG
-// ============================================================
+
 const guideRoles = {
   patients: ['g_p1','g_p2','g_p3','g_p4','g_p5','g_p6','g_p7','g_p8','g_p9','g_p10'],
   staff:    ['g_s1','g_s2','g_s3','g_s4','g_s5','g_s6','g_s7','g_s8','g_s9','g_s10'],
@@ -1208,9 +1198,7 @@ const guideRoles = {
 };
 const checkedItems = new Set();
 
-// ============================================================
-// RENDER HELPERS
-// ============================================================
+
 function t(key) { return (T[currentLang] && T[currentLang][key]) || T['en'][key] || key; }
 
 function updateTranslations() {
@@ -1227,7 +1215,7 @@ function renderStatCards() {
     const col = t(cfg.key + '_color');
     const numClass = col === 'danger' ? 'danger' : col === 'warn' ? 'warn' : '';
     const barClass = col === 'danger' ? 'danger' : col === 'warn' ? 'warn' : '';
-    // parse numeric pct
+  
     const numStr = val.replace('%','').replace('/5','');
     const num = parseFloat(numStr);
     let pct = 0;
@@ -1350,9 +1338,7 @@ function renderAllGuides() {
   ['patients','staff','it'].forEach(r => renderGuidePanel(r));
 }
 
-// ============================================================
-// XAI SIMULATOR LOGIC
-// ============================================================
+
 function updateXAI() {
   const bmi = parseInt(document.getElementById('xai-bmi').value);
   const gen = parseInt(document.getElementById('xai-genetics').value);
@@ -1360,17 +1346,16 @@ function updateXAI() {
 
   document.getElementById('xai-bmi-val').innerText = bmi;
 
-  // Рассчитываем базовый риск от ИМТ (от 15 до 50)
-  // Норма (около 20) даст около 5% риска. ИМТ 50 даст 40%.
+  
   let bmiRisk = Math.floor(((bmi - 15) / 35) * 40);
   if (bmiRisk < 0) bmiRisk = 0;
 
-  let typoRisk = isTypo ? 45 : 0; // Опечатка накидывает 45% сверху
+  let typoRisk = isTypo ? 45 : 0; 
   
   let totalRisk = bmiRisk + gen + typoRisk;
   if (totalRisk > 100) totalRisk = 100;
 
-  // Обновляем "Черный Ящик"
+  
   const bbScore = document.getElementById('blackbox-score');
   bbScore.innerText = totalRisk + '%';
   if (totalRisk >= 70) {
@@ -1381,7 +1366,7 @@ function updateXAI() {
     bbScore.style.color = 'var(--accent-teal)';
   }
 
-  // Обновляем "Журнал Аудита XAI"
+  
   document.getElementById('xai-bmi-bar').style.width = bmiRisk + '%';
   document.getElementById('xai-bmi-bar-val').innerText = bmiRisk + '%';
 
@@ -1398,9 +1383,7 @@ function updateXAI() {
   }
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
+
 function switchTab(tab) {
   currentTab = tab;
   ['research','policy','guidelines','xai'].forEach(t => {
@@ -1433,14 +1416,12 @@ function setLang(lang) {
   if (currentTab === 'xai') updateXAI();
 }
 
-// ============================================================
-// INIT
-// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
-  setLang('ru'); // Начинаем с русского языка
+  setLang('ru'); 
   
-  // Анимация прогресс баров при первой загрузке
+  
   setTimeout(() => {
     document.querySelectorAll('.progress-fill').forEach(el => {
       const w = el.style.width;
